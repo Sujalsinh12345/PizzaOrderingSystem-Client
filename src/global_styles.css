@@ -1,0 +1,5 @@
+@import "bootstrap/dist/css/bootstrap.min.css";
+
+/* Remove Tailwind directives and @apply rules, use Bootstrap classes in your HTML instead. */
+
+/* You can add custom Bootstrap overrides or additional styles below. */
