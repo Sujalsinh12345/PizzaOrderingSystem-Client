@@ -98,6 +98,7 @@ import { UserRole } from '../../models/models';
 
 
 export class HeaderComponent {
+  
   currentUser: any = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')!) : null;
   userRole: UserRole | null = null;
   

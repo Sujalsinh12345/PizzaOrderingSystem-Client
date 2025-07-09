@@ -103,6 +103,7 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { UserRole} from '../../models/models';
 
 
 @Component({
@@ -228,19 +229,74 @@ export class LoginComponent {
   //     });
   //   }
   // }
-     onSubmit(): void {
-      if (this.loginForm.valid) {
-      this.isLoading = true;
-    this.errorMessage = '';
+//      onSubmit(): void {
+//       if (this.loginForm.valid) {
+//       this.isLoading = true;
+//     this.errorMessage = '';
     
-    this.authService.login(this.loginForm.value).subscribe({
+//     this.authService.login(this.loginForm.value).subscribe({
+//       next: (response) => {
+//         this.isLoading = false;
+//         console.log('Login response:', response);
+        
+//         if (response.success) {
+//           console.log('Login successful:', response);
+//           this.router.navigate(['/customer/dashboard']);
+//         } else {
+//           this.errorMessage = response.message || 'Login failed';
+//         }
+//       },
+//       error: (error) => {
+//         this.isLoading = false;
+//         this.errorMessage = 'Login failed. Please try again.';
+//         console.error('Login error:', error);
+//       }
+//     });
+//   }
+// }
+
+onSubmit(): void {
+  if (this.loginForm.valid) {
+    this.isLoading = true;
+    this.errorMessage = '';
+
+    const role = this.loginForm.value.role; // Assuming you have a role field in your form
+    const loginCredentials = this.loginForm.value;
+
+    let loginObservable;
+
+    switch (role) {
+      case UserRole.Customer:
+        loginObservable = this.authService.loginAsCustomer(loginCredentials);
+        break;
+      case UserRole.Admin:
+        console.log('admin:');
+        loginObservable = this.authService.loginAsAdmin(loginCredentials);
+        break;
+      case UserRole.Employee:
+        loginObservable = this.authService.loginAsEmployee(loginCredentials);
+        break;
+      default:
+        this.isLoading = false;
+        this.errorMessage = 'Invalid role selected';
+        return;
+    }
+
+    loginObservable.subscribe({
       next: (response) => {
         this.isLoading = false;
         console.log('Login response:', response);
-        
+
         if (response.success) {
           console.log('Login successful:', response);
-          this.router.navigate(['/customer/dashboard']);
+          // Navigate to the appropriate dashboard based on role
+          if (role === UserRole.Customer) {
+            this.router.navigate(['/customer/dashboard']);
+          } else if (role === UserRole.Admin) {
+            this.router.navigate(['/admin/dashboard']);
+          } else if (role === UserRole.Employee) {
+            this.router.navigate(['/employee/dashboard']);
+          }
         } else {
           this.errorMessage = response.message || 'Login failed';
         }
@@ -253,6 +309,7 @@ export class LoginComponent {
     });
   }
 }
+
 
 
 }

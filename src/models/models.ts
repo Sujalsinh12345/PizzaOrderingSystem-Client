@@ -123,7 +123,7 @@ export interface LoginResponse {
 }
 
 export enum UserRole {
-  Customer = 'customer',
+  Customer = 'Customer',
   Employee = 'Employee',
   Admin = 'Admin'
 }
