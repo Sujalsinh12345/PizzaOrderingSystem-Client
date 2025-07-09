@@ -20,7 +20,7 @@ import { UserRole } from '../../models/models';
             
             <!-- Navigation Menu -->
             <nav class="d-none d-md-flex ms-4 gap-3" *ngIf="currentUser">
-              <a routerLink="/dashboard" 
+              <a routerLink="/customer/dashboard" 
                  routerLinkActive="border-bottom border-primary text-primary"
                  class="nav-link px-2 text-secondary">
                 Dashboard
@@ -64,7 +64,7 @@ import { UserRole } from '../../models/models';
             <ng-container *ngIf="currentUser; else authButtons">
               <div class="d-flex align-items-center gap-2">
                 <span class="text-secondary">
-                  Welcome, {{currentUser.firstName}} {{currentUser.lastName}}
+                  Welcome, {{ currentUser.fname }} {{currentUser.lname}}
                 </span>
                 <span class="badge bg-primary text-white">
                   {{userRole}}
@@ -94,10 +94,13 @@ import { UserRole } from '../../models/models';
     </header>
   `
 })
-export class HeaderComponent {
-  currentUser: any = null;
-  userRole: UserRole | null = null;
 
+
+
+export class HeaderComponent {
+  currentUser: any = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')!) : null;
+  userRole: UserRole | null = null;
+  
   constructor(
     private authService: AuthService,
     private router: Router
@@ -111,6 +114,7 @@ export class HeaderComponent {
     });
   }
 
+  
   logout(): void {
     this.authService.logout();
     this.router.navigate(['/']);

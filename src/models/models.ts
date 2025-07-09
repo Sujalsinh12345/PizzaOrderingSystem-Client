@@ -7,10 +7,8 @@ export interface Customer {
   phoneNumber: string;
   address: string;
   city: string;
-  state: string;
-  zipCode: string;
-  dateCreated?: Date;
-  isActive?: boolean;
+  // dateCreated?: Date;
+  // isActive?: boolean;
 }
 
 export interface Employee {
@@ -125,7 +123,7 @@ export interface LoginResponse {
 }
 
 export enum UserRole {
-  Customer = 'Customer',
+  Customer = 'customer',
   Employee = 'Employee',
   Admin = 'Admin'
 }

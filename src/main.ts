@@ -33,17 +33,7 @@ const routes = [
   { path: '', component: HomeComponent },
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
-  { 
-    path: 'dashboard', 
-    component: DashboardComponent,
-    canActivate: [AuthGuard]
-  },
-  { 
-    path: 'customer/dashboard', 
-    component: DashboardComponent,
-    canActivate: [AuthGuard],
-    data: { roles: [UserRole.Customer] }
-  },
+  { path: 'customer/dashboard', component: DashboardComponent, canActivate: [AuthGuard], data: { roles: [UserRole.Customer] } },
   { 
     path: 'employee/dashboard', 
     component: DashboardComponent,

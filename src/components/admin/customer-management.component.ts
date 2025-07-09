@@ -96,13 +96,13 @@ import { Customer } from '../../models/models';
                 </td>
                 <td>
                   <div class="text-dark">{{ customer.address }}</div>
-                  <div class="text-muted small">{{ customer.city }}, {{ customer.state }} {{ customer.zipCode }}</div>
+                  <!-- <div class="text-muted small">{{ customer.city }}, {{ customer.state }} {{ customer.zipCode }}</div> -->
                 </td>
-                <td>
+                <!-- <td>
                   <span class="badge" [ngClass]="customer.isActive ? 'bg-success' : 'bg-danger'">
                     {{ customer.isActive ? 'Active' : 'Inactive' }}
                   </span>
-                </td>
+                </td> -->
                 <td>
                   <button (click)="editCustomer(customer)" class="btn btn-link text-primary p-0 me-2">Edit</button>
                   <button (click)="deleteCustomer(customer)" class="btn btn-link text-danger p-0">Delete</button>

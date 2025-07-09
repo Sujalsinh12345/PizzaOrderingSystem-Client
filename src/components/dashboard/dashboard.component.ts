@@ -15,7 +15,7 @@ import { UserRole, Order, Pizza } from '../../models/models';
       <!-- Welcome Section -->
       <div class="mb-4">
         <h1 class="h2 fw-bold text-dark">
-          Welcome back, {{ currentUser?.firstName }}!
+          Welcome back, {{ currentUser.fname }}!
         </h1>
         <p class="text-secondary">
           <span *ngIf="authService.isCustomer()">Ready to order some delicious pizza?</span>
@@ -216,6 +216,8 @@ export class DashboardComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    console.log(localStorage);
+    console.log('Dashboard component initialized');
     this.loadDashboardData();
   }
 
