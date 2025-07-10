@@ -15,9 +15,7 @@ import { Customer } from '../../models/models';
           <h1 class="h3 fw-bold text-dark">Customer Management</h1>
           <p class="text-secondary">Manage and view all registered customers</p>
         </div>
-        <button (click)="showCreateForm = !showCreateForm" class="btn btn-primary">
-          {{ showCreateForm ? 'Cancel' : 'Add Customer' }}
-        </button>
+        <!-- Removed Add Customer button -->
       </div>
       <!-- Create/Edit Form -->
       <div *ngIf="showCreateForm || editingCustomer" class="card mb-4">
@@ -51,14 +49,7 @@ import { Customer } from '../../models/models';
                 <label for="city" class="form-label">City</label>
                 <input type="text" id="city" formControlName="city" class="form-control">
               </div>
-              <div class="col-md-4">
-                <label for="state" class="form-label">State</label>
-                <input type="text" id="state" formControlName="state" class="form-control">
-              </div>
-              <div class="col-md-4">
-                <label for="zipCode" class="form-label">ZIP Code</label>
-                <input type="text" id="zipCode" formControlName="zipCode" class="form-control">
-              </div>
+              <!-- Removed state and zip code fields -->
             </div>
             <div class="d-flex gap-2 mt-3">
               <button type="submit" [disabled]="customerForm.invalid" class="btn btn-primary">
@@ -80,15 +71,14 @@ import { Customer } from '../../models/models';
                 <th>Customer</th>
                 <th>Contact</th>
                 <th>Address</th>
-                <th>Status</th>
-                <th>Actions</th>
+                <!-- Removed Actions column -->
               </tr>
             </thead>
             <tbody>
               <tr *ngFor="let customer of customers">
                 <td>
                   <div class="fw-semibold text-dark">{{ customer.firstName }} {{ customer.lastName }}</div>
-                  <div class="text-muted small">ID: {{ customer.id }}</div>
+                  <div class="text-muted small">ID: {{ customer.customerId }}</div>
                 </td>
                 <td>
                   <div class="text-dark">{{ customer.email }}</div>
@@ -96,17 +86,8 @@ import { Customer } from '../../models/models';
                 </td>
                 <td>
                   <div class="text-dark">{{ customer.address }}</div>
-                  <!-- <div class="text-muted small">{{ customer.city }}, {{ customer.state }} {{ customer.zipCode }}</div> -->
                 </td>
-                <!-- <td>
-                  <span class="badge" [ngClass]="customer.isActive ? 'bg-success' : 'bg-danger'">
-                    {{ customer.isActive ? 'Active' : 'Inactive' }}
-                  </span>
-                </td> -->
-                <td>
-                  <button (click)="editCustomer(customer)" class="btn btn-link text-primary p-0 me-2">Edit</button>
-                  <button (click)="deleteCustomer(customer)" class="btn btn-link text-danger p-0">Delete</button>
-                </td>
+                <!-- Removed Actions buttons -->
               </tr>
             </tbody>
           </table>
@@ -132,13 +113,13 @@ export class CustomerManagementComponent implements OnInit {
       email: ['', [Validators.required, Validators.email]],
       phoneNumber: ['', [Validators.required]],
       address: ['', [Validators.required]],
-      city: ['', [Validators.required]],
-      state: ['', [Validators.required]],
-      zipCode: ['', [Validators.required]]
+      city: ['', [Validators.required]]
+      // Removed state and zipCode
     });
   }
 
   ngOnInit(): void {
+    console.log('CustomerManagementComponent initialized');
     this.loadCustomers();
   }
 
@@ -147,9 +128,24 @@ export class CustomerManagementComponent implements OnInit {
     this.customerService.getAllCustomers().subscribe({
       next: (response) => {
         this.loading = false;
-        if (response.success && response.data) {
-          this.customers = response.data;
+        console.log('Full customer API response:', response);
+        let arr: Customer[] = [];
+        if (response.data && Array.isArray(response.data) && response.data.length > 0) {
+          arr = response.data;
+        } else if (response.customers && Array.isArray(response.customers) && response.customers.length > 0) {
+          arr = response.customers;
+        } else if (response.cust && Array.isArray(response.cust) && response.cust.length > 0) {
+          arr = response.cust;
+        } else if (response.ord && Array.isArray(response.ord) && response.ord.length > 0) {
+          arr = response.ord;
         }
+        this.customers = arr.map(c => ({
+          ...c,
+          firstName: c.firstName || c.fname || '',
+          lastName: c.lastName || c.lname || '',
+          phoneNumber: c.phoneNumber || c.phoneNo || ''
+        }));
+        console.log('Loaded customers:', this.customers);
       },
       error: (error) => {
         this.loading = false;
@@ -160,11 +156,22 @@ export class CustomerManagementComponent implements OnInit {
 
   onSubmit(): void {
     if (this.customerForm.valid) {
-      const customerData = this.customerForm.value;
-      
+      // Map form fields to backend fields
+      const formValue = this.customerForm.value;
+      const customerData = {
+        fname: formValue.firstName,
+        lname: formValue.lastName,
+        email: formValue.email,
+        phoneNo: formValue.phoneNumber,
+        address: formValue.address,
+        city: formValue.city
+      };
       if (this.editingCustomer) {
-        this.customerService.updateCustomer(this.editingCustomer.id!, customerData).subscribe({
+        const id = this.editingCustomer.customerId || this.editingCustomer.id;
+        console.log('Updating customer:', id, customerData);
+        this.customerService.updateCustomer(id!, customerData as any).subscribe({
           next: (response) => {
+            console.log('Update response:', response);
             if (response.success) {
               this.loadCustomers();
               this.cancelForm();
@@ -175,8 +182,10 @@ export class CustomerManagementComponent implements OnInit {
           }
         });
       } else {
-        this.customerService.createCustomer(customerData).subscribe({
+        console.log('Creating customer:', customerData);
+        this.customerService.createCustomer(customerData as any).subscribe({
           next: (response) => {
+            console.log('Create response:', response);
             if (response.success) {
               this.loadCustomers();
               this.cancelForm();
@@ -193,20 +202,37 @@ export class CustomerManagementComponent implements OnInit {
   editCustomer(customer: Customer): void {
     this.editingCustomer = customer;
     this.showCreateForm = false;
-    this.customerForm.patchValue(customer);
+    this.customerForm.patchValue({
+      firstName: customer.firstName,
+      lastName: customer.lastName,
+      email: customer.email,
+      phoneNumber: customer.phoneNumber,
+      address: customer.address,
+      city: customer.city
+    });
   }
 
   deleteCustomer(customer: Customer): void {
-    if (confirm(`Are you sure you want to delete ${customer.firstName} ${customer.lastName}?`)) {
-      if (customer.id) {
-        this.customerService.deleteCustomer(customer.id).subscribe({
+    console.log('Customer to delete:', customer);
+    const id = customer.customerId || customer.id;
+    const displayName = (customer.firstName || customer['fname'] || 'Unknown') + ' ' + (customer.lastName || customer['lname'] || 'Unknown');
+    if (confirm(`Are you sure you want to delete ${displayName}?`)) {
+      if (id) {
+        console.log('Deleting customer:', id);
+        this.customerService.deleteCustomer(id).subscribe({
           next: (response) => {
+            console.log('Delete response:', response);
             if (response.success) {
               this.loadCustomers();
             }
           },
           error: (error) => {
             console.error('Error deleting customer:', error);
+            if (error.status === 405) {
+              alert('Delete operation is not allowed for this customer. Please check backend permissions or implementation.');
+            } else {
+              alert('An error occurred while deleting the customer.');
+            }
           }
         });
       }

@@ -186,16 +186,16 @@ import { UserRole, Order, Pizza } from '../../models/models';
                        class="order-item">
                     <div class="order-info">
                       <div class="order-header">
-                        <h4 class="order-number">Order #{{ order.id }}</h4>
-                        <span [class]="getStatusClass(order.orderstatus)" 
+                        <h4 class="order-number">Order #{{ order.orderId }}</h4>
+                        <span [class]="getStatusClass(order.orderStatus)" 
                               class="status-badge">
-                          {{ order.orderstatus }}
+                          {{ order.orderStatus}}
                         </span>
                       </div>
-                      <p class="order-date">{{ order.orderDate | date:'short' }}</p>
+                      <p class="order-date">{{ order.deliveryDateTime | date:'short' }}</p>
                     </div>
                     <div class="order-amount">
-                      <span class="amount">\${{ order.totalprice }}</span>
+                      <span class="amount">\₹{{ order.totalPrice }}</span>
                     </div>
                   </div>
                   
@@ -543,9 +543,15 @@ export class DashboardComponent implements OnInit {
         next: (response) => {
           if (response.success && response.data) {
             this.recentOrders = response.data;
-            this.orderCount = this.recentOrders.length;
-            this.totalSpent = this.recentOrders.reduce((sum, order) => sum + order.totalprice, 0);
+          } else if (response.success && response.ord) {
+            this.recentOrders = response.ord;
+          } else if (response.success && response.order && typeof response.order === 'object' && !Array.isArray(response.order)) {
+            this.recentOrders = [response.order];
+          } else {
+            this.recentOrders = [];
           }
+          this.orderCount = this.recentOrders.length;
+          this.totalSpent = this.recentOrders.reduce((sum, order) => sum + order.totalPrice, 0);
         }
       });
     }
@@ -556,9 +562,15 @@ export class DashboardComponent implements OnInit {
       next: (response) => {
         if (response.success && response.data) {
           this.recentOrders = response.data;
-          this.orderCount = this.recentOrders.length;
-          this.totalRevenue = this.recentOrders.reduce((sum, order) => sum + order.totalprice, 0);
+        } else if (response.success && response.ord) {
+          this.recentOrders = response.ord;
+        } else if (response.success && response.order && typeof response.order === 'object' && !Array.isArray(response.order)) {
+          this.recentOrders = [response.order];
+        } else {
+          this.recentOrders = [];
         }
+        this.orderCount = this.recentOrders.length;
+        this.totalRevenue = this.recentOrders.reduce((sum, order) => sum + order.totalPrice, 0);
       }
     });
   }

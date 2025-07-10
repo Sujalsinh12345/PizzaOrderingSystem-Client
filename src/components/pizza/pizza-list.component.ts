@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 import { PizzaService } from '../../services/pizza.service';
 import { AuthService } from '../../services/auth.service';
 import { Pizza } from '../../models/models';
@@ -356,7 +356,8 @@ export class PizzaListComponent implements OnInit {
 
   constructor(
     private pizzaService: PizzaService,
-    public authService: AuthService
+    public authService: AuthService,
+    private router: Router
   ) { }
 
   ngOnInit(): void {
@@ -371,7 +372,11 @@ export class PizzaListComponent implements OnInit {
         console.log('Pizzas loaded:', response);
         this.loading = false;
         if (response.success && response.data) {
-          this.pizzas = response.data;
+          this.pizzas = response.data.map(pizza => ({
+            ...pizza,
+            selectedSize: 'Small',
+            selectedPrice: pizza.smallPrice
+          }));
         }
       },
       error: (error) => {
@@ -384,12 +389,10 @@ export class PizzaListComponent implements OnInit {
   deletePizza(pizza: Pizza): void {
     if (confirm(`Are you sure you want to delete ${pizza.name}?`)) {
       if (pizza.pizzaId) {
-        console.log(pizza)
-        console.log(`Deleting pizza with ID: ${pizza.pizzaId}`);
         this.pizzaService.deletePizza(pizza.pizzaId).subscribe({
           next: (response) => {
             if (response.success) {
-              this.loadPizzas();
+              this.router.navigate(['/admin/pizzas']);
             }
           },
           error: (error) => {

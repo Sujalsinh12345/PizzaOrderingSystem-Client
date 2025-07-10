@@ -43,21 +43,7 @@ import { Employee } from '../../models/models';
                 <label for="phoneNumber" class="form-label">Phone Number</label>
                 <input type="tel" id="phoneNumber" formControlName="phoneNumber" class="form-control">
               </div>
-              <div class="col-md-6">
-                <label for="position" class="form-label">Position</label>
-                <select id="position" formControlName="position" class="form-select">
-                  <option value="">Select Position</option>
-                  <option value="Manager">Manager</option>
-                  <option value="Chef">Chef</option>
-                  <option value="Delivery Driver">Delivery Driver</option>
-                  <option value="Cashier">Cashier</option>
-                  <option value="Kitchen Staff">Kitchen Staff</option>
-                </select>
-              </div>
-              <div class="col-md-6">
-                <label for="salary" class="form-label">Salary</label>
-                <input type="number" id="salary" formControlName="salary" min="0" step="0.01" class="form-control">
-              </div>
+              <!-- Removed position and salary fields -->
             </div>
             <div class="d-flex gap-2 mt-3">
               <button type="submit" [disabled]="employeeForm.invalid" class="btn btn-primary">
@@ -78,9 +64,6 @@ import { Employee } from '../../models/models';
               <tr>
                 <th>Employee</th>
                 <th>Contact</th>
-                <th>Position</th>
-                <th>Salary</th>
-                <th>Status</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -88,22 +71,11 @@ import { Employee } from '../../models/models';
               <tr *ngFor="let employee of employees">
                 <td>
                   <div class="fw-semibold text-dark">{{ employee.firstName }} {{ employee.lastName }}</div>
-                  <div class="text-muted small">ID: {{ employee.id }}</div>
+                  <div class="text-muted small">ID: {{ employee.employeeId || employee.id }}</div>
                 </td>
                 <td>
                   <div class="text-dark">{{ employee.email }}</div>
                   <div class="text-muted small">{{ employee.phoneNumber }}</div>
-                </td>
-                <td>
-                  <span class="badge bg-info">{{ employee.position }}</span>
-                </td>
-                <td>
-                  $ {{ employee.salary | number:'1.2-2' }}
-                </td>
-                <td>
-                  <span class="badge" [ngClass]="employee.isActive ? 'bg-success' : 'bg-danger'">
-                    {{ employee.isActive ? 'Active' : 'Inactive' }}
-                  </span>
                 </td>
                 <td>
                   <button (click)="editEmployee(employee)" class="btn btn-link text-primary p-0 me-2">Edit</button>
@@ -132,13 +104,13 @@ export class EmployeeManagementComponent implements OnInit {
       firstName: ['', [Validators.required]],
       lastName: ['', [Validators.required]],
       email: ['', [Validators.required, Validators.email]],
-      phoneNumber: ['', [Validators.required]],
-      position: ['', [Validators.required]],
-      salary: ['', [Validators.required, Validators.min(0)]]
+      phoneNumber: ['', [Validators.required]]
+      // Removed position and salary
     });
   }
 
   ngOnInit(): void {
+    console.log('EmployeeManagementComponent initialized');
     this.loadEmployees();
   }
 
@@ -147,9 +119,26 @@ export class EmployeeManagementComponent implements OnInit {
     this.employeeService.getAllEmployees().subscribe({
       next: (response) => {
         this.loading = false;
-        if (response.success && response.data) {
-          this.employees = response.data;
+        console.log('Full employee API response:', response);
+        let arr: Employee[] = [];
+        if (Array.isArray(response)) {
+          arr = response;
+        } else if (response.data && Array.isArray(response.data) && response.data.length > 0) {
+          arr = response.data;
+        } else if (response.employees && Array.isArray(response.employees) && response.employees.length > 0) {
+          arr = response.employees;
+        } else if (response.emp && Array.isArray(response.emp) && response.emp.length > 0) {
+          arr = response.emp;
+        } else if (response.ord && Array.isArray(response.ord) && response.ord.length > 0) {
+          arr = response.ord;
         }
+        this.employees = arr.map(e => ({
+          ...e,
+          firstName: e.firstName || e.fname || '',
+          lastName: e.lastName || e.lname || '',
+          phoneNumber: e.phoneNumber || e.phoneNo || ''
+        }));
+        console.log('Loaded employees:', this.employees);
       },
       error: (error) => {
         this.loading = false;
@@ -163,7 +152,8 @@ export class EmployeeManagementComponent implements OnInit {
       const employeeData = this.employeeForm.value;
       
       if (this.editingEmployee) {
-        this.employeeService.updateEmployee(this.editingEmployee.id!, employeeData).subscribe({
+        const id = this.editingEmployee.employeeId || this.editingEmployee.id;
+        this.employeeService.updateEmployee(id!, employeeData).subscribe({
           next: (response) => {
             if (response.success) {
               this.loadEmployees();
@@ -193,13 +183,19 @@ export class EmployeeManagementComponent implements OnInit {
   editEmployee(employee: Employee): void {
     this.editingEmployee = employee;
     this.showCreateForm = false;
-    this.employeeForm.patchValue(employee);
+    this.employeeForm.patchValue({
+      firstName: employee.firstName,
+      lastName: employee.lastName,
+      email: employee.email,
+      phoneNumber: employee.phoneNumber
+    });
   }
 
   deleteEmployee(employee: Employee): void {
+    const id = employee.employeeId || employee.id;
     if (confirm(`Are you sure you want to delete ${employee.firstName} ${employee.lastName}?`)) {
-      if (employee.id) {
-        this.employeeService.deleteEmployee(employee.id).subscribe({
+      if (id) {
+        this.employeeService.deleteEmployee(id).subscribe({
           next: (response) => {
             if (response.success) {
               this.loadEmployees();

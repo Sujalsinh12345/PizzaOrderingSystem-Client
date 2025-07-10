@@ -20,36 +20,66 @@ import { Order, OrderStatus } from '../../models/models';
             <span *ngIf="authService.isAdmin()">All orders in the system</span>
           </p>
         </div>
+        <button 
+          class="btn btn-outline-primary" 
+          (click)="loadOrders()" 
+          [disabled]="loading">
+          <i class="fas fa-sync-alt me-2"></i>
+          {{ loading ? 'Loading...' : 'Refresh' }}
+        </button>
       </div>
-      <div class="card shadow-sm">
-        <ul class="list-group list-group-flush">
+      
+      <!-- Loading State -->
+      <div *ngIf="loading" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+        <p class="mt-3 text-secondary">Loading orders...</p>
+      </div>
+
+      <!-- Orders List -->
+      <div *ngIf="!loading" class="card shadow-sm">
+        <div *ngIf="orders.length === 0" class="text-center py-5">
+          <div class="text-muted">
+            <i class="fas fa-inbox fa-3x mb-3"></i>
+            <h5>No orders found</h5>
+            <p class="text-secondary">
+              <span *ngIf="authService.isCustomer()">You haven't placed any orders yet.</span>
+              <span *ngIf="authService.isEmployee() || authService.isAdmin()">No orders in the system.</span>
+            </p>
+          </div>
+        </div>
+        
+        <ul *ngIf="orders.length > 0" class="list-group list-group-flush">
           <li *ngFor="let order of orders" class="list-group-item">
             <div class="d-flex justify-content-between align-items-center">
               <div class="flex-grow-1">
                 <div class="d-flex justify-content-between align-items-center">
                   <div>
                     <p class="h5 fw-medium text-dark mb-1">
-                      Order #{{ order.id }}
+                      Order #{{ order.orderId || 'N/A' }}
                     </p>
-                    <p class="small text-muted mb-0" *ngIf="authService.isAdmin() && order.customer">
-                      Customer: {{ order.customer.firstName }} {{ order.customer.lastName }}
+                    <p class="small text-muted mb-0">
+                      Customer ID: {{ order.customerId || 'N/A' }}<br>
+                      Employee ID: {{ order.employeeId || 'N/A' }}<br>
+                      Pizza ID: {{ order.pizzaId || 'N/A' }}
                     </p>
                   </div>
                   <div class="d-flex align-items-center gap-3">
-                    <span [ngClass]="getStatusClass(order.orderstatus)" class="badge rounded-pill px-3 py-2">
-                      {{ order.orderstatus }}
+                    <span class="badge rounded-pill px-3 py-2">
+                      {{ order.orderStatus || 'N/A' }}
                     </span>
                     <span class="h5 fw-bold text-dark mb-0">
-                      ₹{{ order.totalprice}}
+                      ₹{{ order.totalPrice || 'N/A' }}
                     </span>
                   </div>
                 </div>
                 <div class="mt-2">
                   <p class="small text-secondary mb-1">
-                    Order Date: {{ order.orderDate | date:'medium' }}
+                    Order Date: {{ order.deliveryDateTime || 'N/A' }}
                   </p>
                   <p class="small text-secondary mb-1">
-                    Delivery to: 
+                    Delivery to: {{ deliveryAddress || 'N/A' }}
                   </p>
                 </div>
               </div>
@@ -63,6 +93,7 @@ import { Order, OrderStatus } from '../../models/models';
 export class OrderListComponent implements OnInit {
   orders: Order[] = [];
   loading = true;
+  deliveryAddress: string = '';
 
   constructor(
     private orderService: OrderService,
@@ -70,6 +101,12 @@ export class OrderListComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    // Get address from localStorage
+    const userStr = localStorage.getItem('user');
+    if (userStr) {
+      const user = JSON.parse(userStr);
+      this.deliveryAddress = user.address || '';
+    }
     this.loadOrders();
   }
 
@@ -84,12 +121,47 @@ export class OrderListComponent implements OnInit {
         console.log("Fetching orders for customer ID:", currentUser.customerId);
         this.orderService.getCustomerOrders(currentUser.customerId).subscribe({
           next: (response) => {
-            console.log("lasan");
+            console.log("Customer orders response:", response);
+            console.log("Response type:", typeof response);
+            console.log("Response keys:", Object.keys(response));
             this.loading = false;
-            console.log("Response:", response);
-            if (response.success && response.order) {
-              // this.orders = response.order; // 👈 wrap single object into an array
-              console.log('Response.order:', response.order);
+            if (response.success && response.data) {
+              this.orders = response.data.map((o: any) => ({
+                orderId: o.orderId || o.id || o.order_id,
+                customerId: o.customerId || o.custId || o.customer_id,
+                employeeId: o.employeeId || o.empId || o.employee_id,
+                pizzaId: o.pizzaId || o.pizza_id,
+                orderStatus: o.orderStatus || o.status,
+                totalPrice: o.totalPrice || o.price,
+                deliveryDateTime: o.deliveryDateTime || o.date || o.delivery_date
+              }));
+              console.log('Orders loaded:', this.orders);
+            } else if (response.success && response.ord) {
+              this.orders = response.ord.map((o: any) => ({
+                orderId: o.orderId || o.id || o.order_id,
+                customerId: o.customerId || o.custId || o.customer_id,
+                employeeId: o.employeeId || o.empId || o.employee_id,
+                pizzaId: o.pizzaId || o.pizza_id,
+                orderStatus: o.orderStatus || o.status,
+                totalPrice: o.totalPrice || o.price,
+                deliveryDateTime: o.deliveryDateTime || o.date || o.delivery_date
+              }));
+              console.log('Orders loaded from ord field:', this.orders);
+            } else if (response.success && response.order && typeof response.order === 'object' && !Array.isArray(response.order)) {
+              // Handle single order object
+              const o = response.order as any;
+              this.orders = [{
+                orderId: o.orderId || o.id || o.order_id,
+                customerId: o.customerId || o.custId || o.customer_id,
+                employeeId: o.employeeId || o.empId || o.employee_id,
+                pizzaId: o.pizzaId || o.pizza_id,
+                orderStatus: o.orderStatus || o.status,
+                totalPrice: o.totalPrice || o.price,
+                deliveryDateTime: o.deliveryDateTime || o.date || o.delivery_date
+              }];
+              console.log('Single order loaded:', this.orders);
+            } else {
+              console.log('No data found in response. Response structure:', response);
             }
           },
           error: (error) => {
@@ -101,9 +173,18 @@ export class OrderListComponent implements OnInit {
     } else {
       this.orderService.getAllOrders().subscribe({
         next: (response) => {
+          console.log("All orders response:", response);
+          console.log("Response type:", typeof response);
+          console.log("Response keys:", Object.keys(response));
           this.loading = false;
-          if (response.success && response.order) {
-            // this.orders = response.order;
+          if (response.success && response.data) {
+            this.orders = response.data;
+            console.log('All orders loaded:', this.orders);
+          } else if (response.success && response.ord) {
+            this.orders = response.ord;
+            console.log('All orders loaded from ord field:', this.orders);
+          } else {
+            console.log('No data found in response. Response structure:', response);
           }
         },
         error: (error) => {
@@ -116,17 +197,17 @@ export class OrderListComponent implements OnInit {
 
   updateOrderStatus(order: Order, event: any): void {
     const newStatus = event.target.value as OrderStatus;
-    if (order.id) {
-      this.orderService.updateOrderStatus(order.id, newStatus).subscribe({
+    if (order.orderId) {
+      this.orderService.updateOrderStatus(order.orderId, newStatus).subscribe({
         next: (response) => {
           if (response.success) {
-            order.orderstatus = newStatus;
+            order.orderStatus = newStatus;
           }
         },
         error: (error) => {
           console.error('Error updating order status:', error);
           // Reset the select to original value
-          event.target.value = order.orderstatus;
+          event.target.value = order.orderStatus;
         }
       });
     }

@@ -13,6 +13,8 @@ import { PizzaListComponent } from './components/pizza/pizza-list.component';
 import { OrderListComponent } from './components/order/order-list.component';
 import { AuthGuard } from './guards/auth.guard';
 import { UserRole } from './models/models';
+import { PizzaFormComponent } from './components/pizza/pizza-form.component';
+import { OrderPizzaComponent } from './components/pizza/order-pizza.component';
 
 @Component({
   selector: 'app-root',
@@ -72,6 +74,18 @@ const routes = [
     data: { roles: [UserRole.Admin] }
   },
   { 
+    path: 'admin/pizzas/create', 
+    component: PizzaFormComponent,
+    canActivate: [AuthGuard],
+    data: { roles: [UserRole.Admin] }
+  },
+  { 
+    path: 'admin/pizzas/edit/:pizzaId', 
+    component: PizzaFormComponent,
+    canActivate: [AuthGuard],
+    data: { roles: [UserRole.Admin] }
+  },
+  { 
     path: 'admin/customers', 
     loadComponent: () => import('./components/admin/customer-management.component').then(c => c.CustomerManagementComponent),
     canActivate: [AuthGuard],
@@ -88,6 +102,12 @@ const routes = [
     loadComponent: () => import('./components/admin/topping-management.component').then(c => c.ToppingManagementComponent),
     canActivate: [AuthGuard],
     data: { roles: [UserRole.Admin] }
+  },
+  { 
+    path: 'order-pizza', 
+    component: OrderPizzaComponent,
+    canActivate: [AuthGuard],
+    data: { roles: [UserRole.Customer] }
   },
   { path: 'unauthorized', 
     loadComponent: () => import('./components/shared/unauthorized.component').then(c => c.UnauthorizedComponent)

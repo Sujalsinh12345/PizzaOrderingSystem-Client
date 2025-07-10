@@ -1,10 +1,14 @@
 export interface Customer {
   id?: number;
+  customerId?: number;
   firstName: string;
   lastName: string;
+  fname?: string;
+  lname?: string;
   email: string;
   password?: string;
   phoneNumber: string;
+  phoneNo?: string;
   address: string;
   city: string;
   // dateCreated?: Date;
@@ -13,11 +17,15 @@ export interface Customer {
 
 export interface Employee {
   id?: number;
+  employeeId?: number;
   firstName: string;
   lastName: string;
+  fname?: string;
+  lname?: string;
   email: string;
   password?: string;
   phoneNumber: string;
+  phoneNo?: string;
   position: string;
   hireDate?: Date;
   salary: number;
@@ -37,10 +45,16 @@ export interface Admin {
 
 export interface Topping {
   id?: number;
-  name: string;
+  toppingId?: number;
+  toppingName?: string;
+  name?: string;
   smallPrice: number;
   mediumPrice: number;
   largePrice: number;
+  description?: string;
+  imageUrl?: string;
+  isVegetarian?: boolean;
+  isAvailable?: boolean;
 }
 
 export interface Pizza {
@@ -55,18 +69,14 @@ export interface Pizza {
 }
 
 export interface Order {
-  id?: number;
-  pizzaid: number;
+  orderId: number;
   customerId: number;
-  customer?: Customer;
-  orderDate?: Date;
-  totalprice: number;
-  orderstatus: OrderStatus;
-  deliverydatetime: Date;
-  phoneNumber: string;
-  orderItems?: OrderItem[];
   employeeId?: number;
-  employee?: Employee;
+  pizzaId: number;
+  orderStatus: string;
+  totalPrice: number;
+  deliveryDateTime: Date | null;
+  // Add other fields as needed from your API
 }
 
 export interface OrderItem {
@@ -128,6 +138,14 @@ export interface ApiResponse<T> {
   order: boolean;
   success: boolean;
   data?: T;
+  ord?: T;
+  pizza?: T;
+  customers?: T;
+  employees?: T;
+  toppings?: T;
+  cust?: T;
+  emp?: T;
+  top?: T;
   message?: string;
   errors?: string[];
 }

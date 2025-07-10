@@ -44,14 +44,7 @@ import { Topping } from '../../models/models';
                 <input type="url" id="imageUrl" formControlName="imageUrl" class="form-control" placeholder="https://example.com/image.jpg">
               </div>
               <div class="col-12">
-                <div class="form-check form-check-inline me-3">
-                  <input type="checkbox" id="isVegetarian" formControlName="isVegetarian" class="form-check-input">
-                  <label for="isVegetarian" class="form-check-label">Vegetarian</label>
-                </div>
-                <div class="form-check form-check-inline">
-                  <input type="checkbox" id="isAvailable" formControlName="isAvailable" class="form-check-input">
-                  <label for="isAvailable" class="form-check-label">Available</label>
-                </div>
+                <!-- Removed available checkbox from form -->
               </div>
             </div>
             <div class="d-flex gap-2 mt-3">
@@ -72,8 +65,14 @@ import { Topping } from '../../models/models';
             <div class="card-body">
               <div class="d-flex justify-content-between align-items-start mb-3">
                 <div>
-                  <h3 class="h5 fw-semibold text-dark mb-1">{{ topping.name }}</h3>
-                  <p class="h4 fw-bold text-primary mb-0">$ {{ topping.smallPrice }}</p>
+                  <h3 class="h5 fw-semibold text-dark mb-1">{{ topping.toppingName }}</h3>
+                  <div class="mb-1">ID: {{ topping.toppingId }}</div>
+                  <div class="mb-1">Small: ₹{{ topping.smallPrice }}</div>
+                  <div class="mb-1">Medium: ₹{{ topping.mediumPrice }}</div>
+                  <div class="mb-1">Large: ₹{{ topping.largePrice }}</div>
+                  <div class="mb-1" *ngIf="topping.description">Description: {{ topping.description }}</div>
+                  <div class="mb-1" *ngIf="topping.imageUrl">Image: <a [href]="topping.imageUrl" target="_blank">View</a></div>
+                  <!-- Removed Available field -->
                 </div>
               </div>
               <div class="d-flex gap-2">
@@ -107,13 +106,13 @@ export class ToppingManagementComponent implements OnInit {
       name: ['', [Validators.required]],
       price: ['', [Validators.required, Validators.min(0)]],
       description: [''],
-      imageUrl: [''],
-      isVegetarian: [false],
-      isAvailable: [true]
+      imageUrl: ['']
+      // Removed isAvailable
     });
   }
 
   ngOnInit(): void {
+    console.log('ToppingManagementComponent initialized');
     this.loadToppings();
   }
 
@@ -122,9 +121,19 @@ export class ToppingManagementComponent implements OnInit {
     this.toppingService.getAllToppings().subscribe({
       next: (response) => {
         this.loading = false;
-        if (response.success && response.data) {
-          this.toppings = response.data;
+        console.log('Full topping API response:', response);
+        let arr: Topping[] = [];
+        if (response.data && Array.isArray(response.data) && response.data.length > 0) {
+          arr = response.data;
+        } else if (response.toppings && Array.isArray(response.toppings) && response.toppings.length > 0) {
+          arr = response.toppings;
+        } else if (response.top && Array.isArray(response.top) && response.top.length > 0) {
+          arr = response.top;
+        } else if (response.ord && Array.isArray(response.ord) && response.ord.length > 0) {
+          arr = response.ord;
         }
+        this.toppings = arr;
+        console.log('Loaded toppings:', this.toppings);
       },
       error: (error) => {
         this.loading = false;
@@ -191,9 +200,6 @@ export class ToppingManagementComponent implements OnInit {
   cancelForm(): void {
     this.showCreateForm = false;
     this.editingTopping = null;
-    this.toppingForm.reset({
-      isVegetarian: false,
-      isAvailable: true
-    });
+    this.toppingForm.reset();
   }
 }
