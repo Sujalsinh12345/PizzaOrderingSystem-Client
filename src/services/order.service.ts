@@ -36,7 +36,8 @@ export class OrderService {
   }
 
   getCustomerOrders(customerId: number): Observable<ApiResponse<Order[]>> {
-    return this.apiService.get<Order>(`${this.endpoint}/customer/${customerId}`);
+    console.log("Fetching orders for customer ID:", customerId);
+    return this.apiService.get<Order>(`${this.endpoint}/${customerId}`);
   }
 
   getEmployeeOrders(employeeId: number): Observable<ApiResponse<Order[]>> {

@@ -11,192 +11,489 @@ import { UserRole, Order, Pizza } from '../../models/models';
   standalone: true,
   imports: [CommonModule, RouterModule],
   template: `
-    <div class="container py-5">
-      <!-- Welcome Section -->
-      <div class="mb-4">
-        <h1 class="h2 fw-bold text-dark">
-          Welcome back, {{ currentUser.fname }}!
-        </h1>
-        <p class="text-secondary">
-          <span *ngIf="authService.isCustomer()">Ready to order some delicious pizza?</span>
-          <span *ngIf="authService.isEmployee()">Here's what needs your attention today.</span>
-          <span *ngIf="authService.isAdmin()">Here's your business overview.</span>
-        </p>
-      </div>
+    <div class="dashboard-container">
+      <div class="container-material">
+        <!-- Welcome Section -->
+        <div class="welcome-section">
+          <div class="welcome-content">
+            <h1 class="welcome-title">
+              Welcome back, {{ currentUser.fname }}!
+            </h1>
+            <p class="welcome-subtitle">
+              <span *ngIf="authService.isCustomer()">Ready to order some delicious pizza?</span>
+              <span *ngIf="authService.isEmployee()">Here's what needs your attention today.</span>
+              <span *ngIf="authService.isAdmin()">Here's your business overview.</span>
+            </p>
+          </div>
+          <div class="welcome-avatar">
+            <span class="avatar-text">{{ currentUser.fname?.charAt(0) }}{{ currentUser.lname?.charAt(0) }}</span>
+          </div>
+        </div>
 
-      <!-- Stats Cards -->
-      <div class="row g-4 mb-4">
-        <div class="col-12 col-md-6 col-lg-3">
-          <div class="card h-100 shadow-sm p-3 d-flex flex-row align-items-center">
-            <div class="bg-primary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 48px; height: 48px;">
-              <span class="text-primary fs-3">📦</span>
+        <!-- Stats Cards -->
+        <div class="stats-grid">
+          <div class="stat-card material-card">
+            <div class="stat-icon orders-icon">
+              <i class="icon">📦</i>
             </div>
-            <div>
-              <div class="small text-secondary">
+            <div class="stat-content">
+              <div class="stat-label">
                 <span *ngIf="authService.isCustomer()">Your Orders</span>
                 <span *ngIf="authService.isEmployee()">Pending Orders</span>
                 <span *ngIf="authService.isAdmin()">Total Orders</span>
               </div>
-              <div class="h4 fw-bold text-dark">{{ orderCount }}</div>
+              <div class="stat-value">{{ orderCount }}</div>
             </div>
           </div>
-        </div>
 
-        <div class="col-12 col-md-6 col-lg-3">
-          <div class="card h-100 shadow-sm p-3 d-flex flex-row align-items-center">
-            <div class="bg-info bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 48px; height: 48px;">
-              <span class="text-info fs-3">🍕</span>
+          <div class="stat-card material-card">
+            <div class="stat-icon pizzas-icon">
+              <i class="icon">🍕</i>
             </div>
-            <div>
-              <div class="small text-secondary">Available Pizzas</div>
-              <div class="h4 fw-bold text-dark">{{ pizzaCount }}</div>
+            <div class="stat-content">
+              <div class="stat-label">Available Pizzas</div>
+              <div class="stat-value">{{ pizzaCount }}</div>
             </div>
           </div>
-        </div>
 
-        <div class="col-12 col-md-6 col-lg-3" *ngIf="authService.isCustomer()">
-          <div class="card h-100 shadow-sm p-3 d-flex flex-row align-items-center">
-            <div class="bg-success bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 48px; height: 48px;">
-              <span class="text-success fs-3">💰</span>
+          <div class="stat-card material-card" *ngIf="authService.isCustomer()">
+            <div class="stat-icon money-icon">
+              <i class="icon">💰</i>
             </div>
-            <div>
-              <div class="small text-secondary">Total Spent</div>
-              <div class="h4 fw-bold text-dark">\${{ totalSpent }}</div>
+            <div class="stat-content">
+              <div class="stat-label">Total Spent</div>
+              <div class="stat-value">\₹{{ totalSpent }}</div>
             </div>
           </div>
-        </div>
 
-        <div class="col-12 col-md-6 col-lg-3" *ngIf="authService.isAdmin()">
-          <div class="card h-100 shadow-sm p-3 d-flex flex-row align-items-center">
-            <div class="bg-success bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 48px; height: 48px;">
-              <span class="text-success fs-3">💰</span>
+          <div class="stat-card material-card" *ngIf="authService.isAdmin()">
+            <div class="stat-icon revenue-icon">
+              <i class="icon">💰</i>
             </div>
-            <div>
-              <div class="small text-secondary">Total Revenue</div>
-              <div class="h4 fw-bold text-dark">\${{ totalRevenue }}</div>
+            <div class="stat-content">
+              <div class="stat-label">Total Revenue</div>
+              <div class="stat-value">\₹{{ totalRevenue }}</div>
             </div>
           </div>
-        </div>
 
-        <div class="col-12 col-md-6 col-lg-3">
-          <div class="card h-100 shadow-sm p-3 d-flex flex-row align-items-center">
-            <div class="bg-warning bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 48px; height: 48px;">
-              <span class="text-warning fs-3">⭐</span>
+          <div class="stat-card material-card">
+            <div class="stat-icon popular-icon">
+              <i class="icon">⭐</i>
             </div>
-            <div>
-              <div class="small text-secondary">
+            <div class="stat-content">
+              <div class="stat-label">
                 <span *ngIf="authService.isCustomer()">Favorite</span>
                 <span *ngIf="!authService.isCustomer()">Popular</span>
                 Pizza
               </div>
-              <div class="h5 fw-bold text-dark">{{ popularPizza || 'Margherita' }}</div>
+              <div class="stat-value">{{ popularPizza || 'Margherita' }}</div>
             </div>
           </div>
         </div>
-      </div>
 
-      <!-- Quick Actions -->
-      <div class="row g-4">
-        <!-- Customer Quick Actions -->
-        <div *ngIf="authService.isCustomer()" class="col-12 col-lg-6">
-          <div class="card shadow-sm">
-            <div class="card-body">
-              <h3 class="h5 card-title mb-4">Quick Actions</h3>
-              <div class="d-grid gap-2">
-                <button routerLink="/pizzas" class="btn btn-primary">
-                  Browse Pizzas
-                </button>
-                <button routerLink="/orders" class="btn btn-outline-secondary">
-                  View My Orders
-                </button>
+        <!-- Quick Actions and Recent Orders -->
+        <div class="dashboard-content">
+          <!-- Quick Actions -->
+          <div class="actions-section">
+            <!-- Customer Quick Actions -->
+            <div *ngIf="authService.isCustomer()" class="actions-card material-card">
+              <div class="card-header">
+                <h3 class="card-title">
+                  <i class="title-icon">⚡</i>
+                  Quick Actions
+                </h3>
+              </div>
+              <div class="card-content">
+                <div class="actions-grid">
+                  <button routerLink="/pizzas" class="btn-material btn-material-primary">
+                    <i class="btn-icon">🍕</i>
+                    Browse Pizzas
+                  </button>
+                  <button routerLink="/orders" class="btn-material btn-material-outline">
+                    <i class="btn-icon">📋</i>
+                    View My Orders
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
-        </div>
 
-        <!-- Employee Quick Actions -->
-        <div *ngIf="authService.isEmployee()" class="col-12 col-lg-6">
-          <div class="card shadow-sm">
-            <div class="card-body">
-              <h3 class="h5 card-title mb-4">Quick Actions</h3>
-              <div class="d-grid gap-2">
-                <button routerLink="/orders" class="btn btn-primary">
-                  Manage Orders
-                </button>
-                <button routerLink="/pizzas" class="btn btn-outline-secondary">
-                  View Pizzas
-                </button>
+            <!-- Employee Quick Actions -->
+            <div *ngIf="authService.isEmployee()" class="actions-card material-card">
+              <div class="card-header">
+                <h3 class="card-title">
+                  <i class="title-icon">⚡</i>
+                  Quick Actions
+                </h3>
+              </div>
+              <div class="card-content">
+                <div class="actions-grid">
+                  <button routerLink="/orders" class="btn-material btn-material-primary">
+                    <i class="btn-icon">📋</i>
+                    Manage Orders
+                  </button>
+                  <button routerLink="/pizzas" class="btn-material btn-material-outline">
+                    <i class="btn-icon">🍕</i>
+                    View Pizzas
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
-        </div>
 
-        <!-- Admin Quick Actions -->
-        <div *ngIf="authService.isAdmin()" class="col-12 col-lg-6">
-          <div class="card shadow-sm">
-            <div class="card-body">
-              <h3 class="h5 card-title mb-4">Management</h3>
-              <div class="row g-2">
-                <div class="col-6">
-                  <button routerLink="/admin/pizzas" class="btn btn-primary w-100">
+            <!-- Admin Quick Actions -->
+            <div *ngIf="authService.isAdmin()" class="actions-card material-card">
+              <div class="card-header">
+                <h3 class="card-title">
+                  <i class="title-icon">⚙️</i>
+                  Management
+                </h3>
+              </div>
+              <div class="card-content">
+                <div class="admin-actions-grid">
+                  <button routerLink="/admin/pizzas" class="btn-material btn-material-primary">
+                    <i class="btn-icon">🍕</i>
                     Manage Pizzas
                   </button>
-                </div>
-                <div class="col-6">
-                  <button routerLink="/admin/toppings" class="btn btn-primary w-100">
+                  <button routerLink="/admin/toppings" class="btn-material btn-material-primary">
+                    <i class="btn-icon">🥬</i>
                     Manage Toppings
                   </button>
-                </div>
-                <div class="col-6">
-                  <button routerLink="/admin/employees" class="btn btn-outline-secondary w-100">
+                  <button routerLink="/admin/employees" class="btn-material btn-material-outline">
+                    <i class="btn-icon">👨‍💼</i>
                     Manage Staff
                   </button>
-                </div>
-                <div class="col-6">
-                  <button routerLink="/admin/customers" class="btn btn-outline-secondary w-100">
+                  <button routerLink="/admin/customers" class="btn-material btn-material-outline">
+                    <i class="btn-icon">👥</i>
                     View Customers
                   </button>
                 </div>
               </div>
             </div>
           </div>
-        </div>
 
-        <!-- Recent Orders -->
-        <div class="col-12">
-          <div class="card shadow-sm">
-            <div class="card-body">
-              <h3 class="h5 card-title mb-4">
-                <span *ngIf="authService.isCustomer()">Recent Orders</span>
-                <span *ngIf="!authService.isCustomer()">Latest Orders</span>
-              </h3>
-              <div class="list-group">
-                <div *ngFor="let order of recentOrders.slice(0, 3)" 
-                     class="list-group-item d-flex justify-content-between align-items-center">
-                  <div>
-                    <p class="mb-1 fw-medium text-dark">Order #{{ order.id }}</p>
-                    <p class="mb-0 small text-secondary">{{ order.orderDate | date:'short' }}</p>
+          <!-- Recent Orders -->
+          <div class="orders-section">
+            <div class="orders-card material-card">
+              <div class="card-header">
+                <h3 class="card-title">
+                  <i class="title-icon">📋</i>
+                  <span *ngIf="authService.isCustomer()">Recent Orders</span>
+                  <span *ngIf="!authService.isCustomer()">Latest Orders</span>
+                </h3>
+              </div>
+              <div class="card-content">
+                <div class="orders-list">
+                  <div *ngFor="let order of recentOrders.slice(0, 3)" 
+                       class="order-item">
+                    <div class="order-info">
+                      <div class="order-header">
+                        <h4 class="order-number">Order #{{ order.id }}</h4>
+                        <span [class]="getStatusClass(order.orderstatus)" 
+                              class="status-badge">
+                          {{ order.orderstatus }}
+                        </span>
+                      </div>
+                      <p class="order-date">{{ order.orderDate | date:'short' }}</p>
+                    </div>
+                    <div class="order-amount">
+                      <span class="amount">\${{ order.totalprice }}</span>
+                    </div>
                   </div>
-                  <div class="text-end">
-                    <p class="mb-1 fw-medium text-dark">\${{ order.totalAmount }}</p>
-                    <span [class]="getStatusClass(order.status)" 
-                          class="badge rounded-pill">
-                      {{ order.status }}
-                    </span>
+                  
+                  <div *ngIf="recentOrders.length === 0" class="empty-orders">
+                    <i class="empty-icon">📋</i>
+                    <p class="empty-text">No orders yet</p>
                   </div>
                 </div>
+                
+                <div class="card-footer">
+                  <button routerLink="/orders" 
+                          class="btn-material btn-material-outline btn-sm">
+                    <i class="btn-icon">👁️</i>
+                    View All Orders
+                  </button>
+                </div>
               </div>
-              
-              <button routerLink="/orders" 
-                      class="btn btn-link text-primary text-decoration-none p-0 mt-3">
-                View All Orders →
-              </button>
             </div>
           </div>
         </div>
       </div>
     </div>
-  `
+  `,
+  styles: [`
+    .dashboard-container {
+      padding: 2rem 0;
+      min-height: 100vh;
+    }
+    
+    .welcome-section {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 3rem;
+      padding: 2rem;
+      background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+      border-radius: var(--border-radius);
+      color: white;
+    }
+    
+    .welcome-content {
+      flex: 1;
+    }
+    
+    .welcome-title {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+    
+    .welcome-subtitle {
+      font-size: 1.125rem;
+      opacity: 0.9;
+      margin-bottom: 0;
+    }
+    
+    .welcome-avatar {
+      width: 80px;
+      height: 80px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      font-weight: 700;
+      backdrop-filter: blur(10px);
+    }
+    
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 3rem;
+    }
+    
+    .stat-card {
+      padding: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    
+    .stat-icon {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    
+    .orders-icon {
+      background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+    }
+    
+    .pizzas-icon {
+      background: linear-gradient(135deg, #17a2b8, #20c997);
+    }
+    
+    .money-icon {
+      background: linear-gradient(135deg, #28a745, #20c997);
+    }
+    
+    .revenue-icon {
+      background: linear-gradient(135deg, #28a745, #20c997);
+    }
+    
+    .popular-icon {
+      background: linear-gradient(135deg, #ffc107, #fd7e14);
+    }
+    
+    .stat-icon .icon {
+      font-size: 1.5rem;
+      color: white;
+    }
+    
+    .stat-content {
+      flex: 1;
+    }
+    
+    .stat-label {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      font-weight: 500;
+      margin-bottom: 0.25rem;
+    }
+    
+    .stat-value {
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+    
+    .dashboard-content {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 2rem;
+    }
+    
+    .actions-card,
+    .orders-card {
+      height: fit-content;
+    }
+    
+    .card-header {
+      padding: 1.5rem 1.5rem 0;
+      border-bottom: 1px solid #e0e0e0;
+      margin-bottom: 1.5rem;
+    }
+    
+    .card-title {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin: 0;
+    }
+    
+    .title-icon {
+      font-size: 1.125rem;
+    }
+    
+    .card-content {
+      padding: 0 1.5rem 1.5rem;
+    }
+    
+    .actions-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    
+    .admin-actions-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+    
+    .orders-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    
+    .order-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem;
+      border: 1px solid #e0e0e0;
+      border-radius: var(--border-radius);
+      background: #fafafa;
+    }
+    
+    .order-info {
+      flex: 1;
+    }
+    
+    .order-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.5rem;
+    }
+    
+    .order-number {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin: 0;
+    }
+    
+    .status-badge {
+      padding: 0.25rem 0.75rem;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    
+    .order-date {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      margin: 0;
+    }
+    
+    .order-amount {
+      text-align: right;
+    }
+    
+    .amount {
+      font-size: 1.125rem;
+      font-weight: 700;
+      color: var(--primary-color);
+    }
+    
+    .empty-orders {
+      text-align: center;
+      padding: 2rem;
+      color: var(--text-secondary);
+    }
+    
+    .empty-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      display: block;
+    }
+    
+    .empty-text {
+      font-size: 1.125rem;
+      margin: 0;
+    }
+    
+    .card-footer {
+      padding-top: 1.5rem;
+      border-top: 1px solid #e0e0e0;
+      text-align: center;
+    }
+    
+    @media (max-width: 992px) {
+      .dashboard-content {
+        grid-template-columns: 1fr;
+      }
+      
+      .welcome-section {
+        flex-direction: column;
+        text-align: center;
+        gap: 1rem;
+      }
+      
+      .welcome-title {
+        font-size: 2rem;
+      }
+      
+      .stats-grid {
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      }
+      
+      .admin-actions-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .stat-card {
+        flex-direction: column;
+        text-align: center;
+      }
+    }
+  `]
 })
 export class DashboardComponent implements OnInit {
   currentUser: any = null;
@@ -247,7 +544,7 @@ export class DashboardComponent implements OnInit {
           if (response.success && response.data) {
             this.recentOrders = response.data;
             this.orderCount = this.recentOrders.length;
-            this.totalSpent = this.recentOrders.reduce((sum, order) => sum + order.totalAmount, 0);
+            this.totalSpent = this.recentOrders.reduce((sum, order) => sum + order.totalprice, 0);
           }
         }
       });
@@ -260,7 +557,7 @@ export class DashboardComponent implements OnInit {
         if (response.success && response.data) {
           this.recentOrders = response.data;
           this.orderCount = this.recentOrders.length;
-          this.totalRevenue = this.recentOrders.reduce((sum, order) => sum + order.totalAmount, 0);
+          this.totalRevenue = this.recentOrders.reduce((sum, order) => sum + order.totalprice, 0);
         }
       }
     });
@@ -269,21 +566,21 @@ export class DashboardComponent implements OnInit {
   getStatusClass(status: string): string {
     switch (status) {
       case 'Pending':
-        return 'badge bg-warning text-dark';
+        return 'badge-material bg-warning';
       case 'Confirmed':
-        return 'badge bg-primary';
+        return 'badge-material bg-primary';
       case 'Preparing':
       case 'Baking':
-        return 'badge bg-info text-dark';
+        return 'badge-material bg-info';
       case 'Ready':
       case 'Out_for_Delivery':
-        return 'badge bg-secondary';
+        return 'badge-material bg-secondary';
       case 'Delivered':
-        return 'badge bg-success';
+        return 'badge-material bg-success';
       case 'Cancelled':
-        return 'badge bg-danger';
+        return 'badge-material bg-danger';
       default:
-        return 'badge bg-light text-dark';
+        return 'badge-material bg-light';
     }
   }
 }

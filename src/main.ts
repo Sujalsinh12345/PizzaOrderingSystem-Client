@@ -19,13 +19,23 @@ import { UserRole } from './models/models';
   standalone: true,
   imports: [CommonModule, RouterOutlet, HeaderComponent],
   template: `
-    <div class="container-fluid min-vh-100 bg-light">
+    <div class="app-container">
       <app-header></app-header>
-      <main>
+      <main class="main-content">
         <router-outlet></router-outlet>
       </main>
     </div>
-  `
+  `,
+  styles: [`
+    .app-container {
+      min-height: 100vh;
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    }
+    
+    .main-content {
+      padding-top: 0;
+    }
+  `]
 })
 export class App { }
 

@@ -36,11 +36,11 @@ import { Order, OrderStatus } from '../../models/models';
                     </p>
                   </div>
                   <div class="d-flex align-items-center gap-3">
-                    <span [ngClass]="getStatusClass(order.status)" class="badge rounded-pill px-3 py-2">
-                      {{ order.status }}
+                    <span [ngClass]="getStatusClass(order.orderstatus)" class="badge rounded-pill px-3 py-2">
+                      {{ order.orderstatus }}
                     </span>
                     <span class="h5 fw-bold text-dark mb-0">
-                      \${{ order.totalAmount }}
+                      ₹{{ order.totalprice}}
                     </span>
                   </div>
                 </div>
@@ -49,10 +49,7 @@ import { Order, OrderStatus } from '../../models/models';
                     Order Date: {{ order.orderDate | date:'medium' }}
                   </p>
                   <p class="small text-secondary mb-1">
-                    Delivery to: {{ order.deliveryAddress }}
-                  </p>
-                  <p class="small text-secondary mb-1" *ngIf="order.specialInstructions">
-                    Special Instructions: {{ order.specialInstructions }}
+                    Delivery to: 
                   </p>
                 </div>
               </div>
@@ -81,12 +78,18 @@ export class OrderListComponent implements OnInit {
     
     if (this.authService.isCustomer()) {
       const currentUser = this.authService.getCurrentUser();
-      if (currentUser?.id) {
-        this.orderService.getCustomerOrders(currentUser.id).subscribe({
+      console.log(localStorage.getItem('role'));
+
+      if (localStorage.getItem('role') === 'Customer') {
+        console.log("Fetching orders for customer ID:", currentUser.customerId);
+        this.orderService.getCustomerOrders(currentUser.customerId).subscribe({
           next: (response) => {
+            console.log("lasan");
             this.loading = false;
-            if (response.success && response.data) {
-              this.orders = response.data;
+            console.log("Response:", response);
+            if (response.success && response.order) {
+              // this.orders = response.order; // 👈 wrap single object into an array
+              console.log('Response.order:', response.order);
             }
           },
           error: (error) => {
@@ -99,8 +102,8 @@ export class OrderListComponent implements OnInit {
       this.orderService.getAllOrders().subscribe({
         next: (response) => {
           this.loading = false;
-          if (response.success && response.data) {
-            this.orders = response.data;
+          if (response.success && response.order) {
+            // this.orders = response.order;
           }
         },
         error: (error) => {
@@ -117,13 +120,13 @@ export class OrderListComponent implements OnInit {
       this.orderService.updateOrderStatus(order.id, newStatus).subscribe({
         next: (response) => {
           if (response.success) {
-            order.status = newStatus;
+            order.orderstatus = newStatus;
           }
         },
         error: (error) => {
           console.error('Error updating order status:', error);
           // Reset the select to original value
-          event.target.value = order.status;
+          event.target.value = order.orderstatus;
         }
       });
     }

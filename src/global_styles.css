@@ -1,5 +1,320 @@
 @import "bootstrap/dist/css/bootstrap.min.css";
 
-/* Remove Tailwind directives and @apply rules, use Bootstrap classes in your HTML instead. */
+/* Material Design inspired custom styles */
+:root {
+  --primary-color: #1976d2;
+  --primary-light: #42a5f5;
+  --primary-dark: #1565c0;
+  --secondary-color: #424242;
+  --accent-color: #ff6b35;
+  --success-color: #4caf50;
+  --warning-color: #ff9800;
+  --danger-color: #f44336;
+  --light-gray: #f5f5f5;
+  --dark-gray: #212121;
+  --text-primary: #212121;
+  --text-secondary: #757575;
+  --border-radius: 8px;
+  --box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  --box-shadow-hover: 0 4px 8px rgba(0,0,0,0.15);
+  --transition: all 0.3s ease;
+}
 
-/* You can add custom Bootstrap overrides or additional styles below. */
+/* Global styles */
+body {
+  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  color: var(--text-primary);
+  background-color: #fafafa;
+  line-height: 1.6;
+}
+
+/* Material Design Card Styles */
+.material-card {
+  background: white;
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  transition: var(--transition);
+  border: none;
+  overflow: hidden;
+}
+
+.material-card:hover {
+  box-shadow: var(--box-shadow-hover);
+  transform: translateY(-2px);
+}
+
+/* Material Design Button Styles */
+.btn-material {
+  border-radius: var(--border-radius);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: var(--transition);
+  border: none;
+  padding: 12px 24px;
+  font-size: 14px;
+}
+
+.btn-material-primary {
+  background: var(--primary-color);
+  color: white;
+}
+
+.btn-material-primary:hover {
+  background: var(--primary-dark);
+  color: white;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(25, 118, 210, 0.3);
+}
+
+.btn-material-outline {
+  border: 2px solid var(--primary-color);
+  color: var(--primary-color);
+  background: transparent;
+}
+
+.btn-material-outline:hover {
+  background: var(--primary-color);
+  color: white;
+  transform: translateY(-1px);
+}
+
+/* Material Design Input Styles */
+.form-control-material {
+  border: 2px solid #e0e0e0;
+  border-radius: var(--border-radius);
+  padding: 12px 16px;
+  transition: var(--transition);
+  background: white;
+}
+
+.form-control-material:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.1);
+  outline: none;
+}
+
+/* Material Design Navigation */
+.nav-material {
+  background: white;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.nav-material .nav-link {
+  color: var(--text-secondary);
+  font-weight: 500;
+  padding: 16px 20px;
+  transition: var(--transition);
+  border-bottom: 2px solid transparent;
+}
+
+.nav-material .nav-link:hover,
+.nav-material .nav-link.active {
+  color: var(--primary-color);
+  border-bottom-color: var(--primary-color);
+  background: rgba(25, 118, 210, 0.05);
+}
+
+/* Material Design Badge Styles */
+.badge-material {
+  border-radius: 12px;
+  padding: 6px 12px;
+  font-weight: 500;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Material Design Typography */
+.text-material-primary {
+  color: var(--primary-color);
+}
+
+.text-material-secondary {
+  color: var(--text-secondary);
+}
+
+/* Material Design Spacing */
+.section-padding {
+  padding: 80px 0;
+}
+
+.container-material {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* Material Design Grid */
+.row-material {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 24px;
+  margin: 0;
+}
+
+/* Material Design Hero Section */
+.hero-material {
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+  color: white;
+  padding: 120px 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-material::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="1" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+  opacity: 0.3;
+}
+
+/* Material Design Loading Spinner */
+.spinner-material {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #e0e0e0;
+  border-top: 4px solid var(--primary-color);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Material Design Responsive */
+@media (max-width: 768px) {
+  .container-material {
+    padding: 0 16px;
+  }
+  
+  .section-padding {
+    padding: 60px 0;
+  }
+  
+  .hero-material {
+    padding: 80px 0;
+  }
+}
+
+/* Material Design Form Styles */
+.form-material {
+  background: white;
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  padding: 32px;
+  max-width: 400px;
+  width: 100%;
+}
+
+.form-material .form-label {
+  font-weight: 500;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+/* Material Design Alert Styles */
+.alert-material {
+  border-radius: var(--border-radius);
+  border: none;
+  padding: 16px 20px;
+  font-weight: 500;
+}
+
+.alert-material-success {
+  background: rgba(76, 175, 80, 0.1);
+  color: var(--success-color);
+  border-left: 4px solid var(--success-color);
+}
+
+.alert-material-danger {
+  background: rgba(244, 67, 54, 0.1);
+  color: var(--danger-color);
+  border-left: 4px solid var(--danger-color);
+}
+
+/* Material Design Table Styles */
+.table-material {
+  background: white;
+  border-radius: var(--border-radius);
+  overflow: hidden;
+  box-shadow: var(--box-shadow);
+}
+
+.table-material th {
+  background: var(--light-gray);
+  font-weight: 600;
+  color: var(--text-primary);
+  border: none;
+  padding: 16px;
+}
+
+.table-material td {
+  padding: 16px;
+  border-bottom: 1px solid #e0e0e0;
+  vertical-align: middle;
+}
+
+/* Material Design Modal Styles */
+.modal-material .modal-content {
+  border-radius: var(--border-radius);
+  border: none;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+}
+
+.modal-material .modal-header {
+  border-bottom: 1px solid #e0e0e0;
+  padding: 24px;
+}
+
+.modal-material .modal-body {
+  padding: 24px;
+}
+
+.modal-material .modal-footer {
+  border-top: 1px solid #e0e0e0;
+  padding: 24px;
+}
+
+/* Material Design Dropdown Styles */
+.dropdown-material .dropdown-menu {
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow-hover);
+  border: none;
+  padding: 8px 0;
+}
+
+.dropdown-material .dropdown-item {
+  padding: 12px 20px;
+  transition: var(--transition);
+}
+
+.dropdown-material .dropdown-item:hover {
+  background: rgba(25, 118, 210, 0.05);
+  color: var(--primary-color);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--primary-color);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-dark);
+}

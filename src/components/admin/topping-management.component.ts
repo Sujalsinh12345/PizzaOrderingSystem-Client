@@ -73,19 +73,9 @@ import { Topping } from '../../models/models';
               <div class="d-flex justify-content-between align-items-start mb-3">
                 <div>
                   <h3 class="h5 fw-semibold text-dark mb-1">{{ topping.name }}</h3>
-                  <p class="h4 fw-bold text-primary mb-0">$ {{ topping.price }}</p>
-                </div>
-                <div class="d-flex flex-column align-items-end gap-1">
-                  <span *ngIf="topping.isVegetarian" class="badge bg-success mb-1">Vegetarian</span>
-                  <span class="badge" [ngClass]="topping.isAvailable ? 'bg-success' : 'bg-danger'">
-                    {{ topping.isAvailable ? 'Available' : 'Out of Stock' }}
-                  </span>
+                  <p class="h4 fw-bold text-primary mb-0">$ {{ topping.smallPrice }}</p>
                 </div>
               </div>
-              <div *ngIf="topping.imageUrl" class="mb-3">
-                <img [src]="topping.imageUrl" [alt]="topping.name" class="img-fluid rounded mb-2" style="height: 128px; object-fit: cover;">
-              </div>
-              <p class="text-secondary small mb-3">{{ topping.description || 'No description available' }}</p>
               <div class="d-flex gap-2">
                 <button (click)="editTopping(topping)" class="btn btn-outline-primary flex-fill">Edit</button>
                 <button (click)="deleteTopping(topping)" class="btn btn-outline-danger flex-fill">Delete</button>

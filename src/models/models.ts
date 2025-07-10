@@ -38,36 +38,32 @@ export interface Admin {
 export interface Topping {
   id?: number;
   name: string;
-  price: number;
-  description?: string;
-  isVegetarian: boolean;
-  isAvailable: boolean;
-  imageUrl?: string;
+  smallPrice: number;
+  mediumPrice: number;
+  largePrice: number;
 }
 
 export interface Pizza {
-  id?: number;
+  pizzaId?: number;
   name: string;
-  description: string;
-  basePrice: number;
-  size: PizzaSize;
-  crust: CrustType;
-  isVegetarian: boolean;
-  isAvailable: boolean;
+  smallPrice: number;
+  mediumPrice: number;
+  largePrice: number;
+  category: string;
   imageUrl?: string;
   toppings?: Topping[];
 }
 
 export interface Order {
   id?: number;
+  pizzaid: number;
   customerId: number;
   customer?: Customer;
   orderDate?: Date;
-  totalAmount: number;
-  status: OrderStatus;
-  deliveryAddress: string;
+  totalprice: number;
+  orderstatus: OrderStatus;
+  deliverydatetime: Date;
   phoneNumber: string;
-  specialInstructions?: string;
   orderItems?: OrderItem[];
   employeeId?: number;
   employee?: Employee;
@@ -129,6 +125,7 @@ export enum UserRole {
 }
 
 export interface ApiResponse<T> {
+  order: boolean;
   success: boolean;
   data?: T;
   message?: string;
