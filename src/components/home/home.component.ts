@@ -102,6 +102,7 @@ import { AuthService } from '../../services/auth.service';
                 <h3 class="pizza-title">Classic Margherita</h3>
                 <p class="pizza-description">
                   Fresh mozzarella, basil, and our signature 
+                  
                 </p>
                 <div class="pizza-price">
                   <span class="price">₹400</span>
